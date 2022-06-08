@@ -1,13 +1,29 @@
 from django.shortcuts import render
 from rest_framework import viewsets
+from django.contrib.auth.models import User
+from rest_framework import permissions
+from rest_framework import generics
 
+from .permissions import IsOwnerOrReadOnly
 from .models import Good, GoodImage, GoodComment, Auction, Bet, Order
-from .serializers import GoodSerializer, GoodImageSerializer, GoodCommentSerializer, AuctionSerializer, BetSerializer, OrderSerializer
+from .serializers import GoodSerializer, GoodImageSerializer, GoodCommentSerializer, AuctionSerializer, BetSerializer, OrderSerializer, UserSerializer, RegisterSerializer
 
+
+class RegisterView(generics.CreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = RegisterSerializer
+
+class UserViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
 
 class GoodViewSet(viewsets.ModelViewSet):
     queryset = Good.objects.all()
     serializer_class = GoodSerializer
+    permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
 
 class GoodImageViewSet(viewsets.ModelViewSet):
     queryset = GoodImage.objects.all()
