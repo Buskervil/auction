@@ -1,3 +1,4 @@
 auctionEnv/*
 *.pyc
 frontend/node_modules/*
+.vscode/*

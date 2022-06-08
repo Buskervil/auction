@@ -10,10 +10,13 @@ class Good(models.Model):
     description = models.TextField(max_length=1024, blank=True)
     price = models.DecimalField(max_digits=12, decimal_places=2, validators=[MinValueValidator(0)])
     published_at = models.DateTimeField(auto_now_add=True)
-    author = models.ForeignKey(
+    owner = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='goods')
     amount = models.IntegerField(validators=[MinValueValidator(0)], default=1)
     is_active = models.BooleanField(default=True)
+
+    def orders_count(self):
+        self.orders.count()
 
 
 class GoodImage(models.Model):
@@ -26,7 +29,7 @@ class GoodImage(models.Model):
 class GoodComment(models.Model):
     good = models.ForeignKey(
         Good, on_delete=models.CASCADE, related_name='comments')
-    user = models.ForeignKey(
+    owner = models.ForeignKey(
         User, on_delete=models.SET_NULL, related_name='comments', null=True)
     rating = models.IntegerField(default=5, validators=[
                                  MinValueValidator(1), MaxValueValidator(5)])
@@ -47,15 +50,18 @@ class Auction(models.Model):
 
 
 class Bet(models.Model):
-    user = models.ForeignKey(
+    owner = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='bets')
     auction = models.ForeignKey(
         Auction, on_delete=models.CASCADE, related_name='bets')
     price = models.DecimalField(max_digits=12, decimal_places=2)
+    created_at = models.DateTimeField(auto_now_add=True)
     is_final = models.BooleanField(default=False)
 
 
 class Order(models.Model):
-    good = models.ForeignKey(Good, on_delete=models.PROTECT)
+    buyer = models.ForeignKey(User, on_delete=models.CASCADE, related_name="orders")
+    good = models.ForeignKey(Good, on_delete=models.PROTECT, related_name="orders")
+    buyer_adress = models.CharField(max_length=512)
     track_number = models.CharField(max_length=128)
-    status = models.CharField(max_length=128)
+    status = models.CharField(max_length=128, choices=[(0, 'Ожидает отправки'), (1, 'Отправлен'), (2, 'Получен')], default='Ожидает отправки')
