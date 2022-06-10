@@ -1,53 +1,63 @@
 <template>
-  <div class="about">
-    <h1>This is an about page</h1>
-    <p>Зачем она нужна?{{ message }}</p>
-    <button v-on:click="reverseMessage">Перевернуть</button>
-    <button v-on:click="get">Запрос</button>
+  <div class="container">
+    <div class="row search-form">
+      <div class="form-floating col-5 offset-3">
+        <input
+          type="text"
+          id="search"
+          class="form-control"
+          v-model="query"
+          placeholder="Чайник электрический"
+        />
+        <label for="search">Введите название товара</label>
+      </div>
+      <button class="search-button btn btn-dark col-1">Поиск</button>
+    </div>
     <GoodCard
-    v-for="g in goods" 
-    v-bind:good="g"
-    v-bind:key="g.id" />
+      v-for="good in goods"
+      v-bind:good="good"
+      v-bind:key="good.id"
+      class="col-12"
+    />
   </div>
-  
 </template>
 
 <script>
-
-  import GoodCard from '@/components/GoodCard.vue';
-  import {Good} from '../api/goods';
+import GoodCard from "@/components/GoodCard.vue";
 
 export default {
   data() {
     return {
       count: "hello",
-      message: "Привет",
-      goods: [],
+      query: "",
       testGood: {
         title: "Microwave",
         description: "Very good, I want it self",
         price: 21980.45,
         published_at: Date.now(),
         author: "Rosette",
-        is_active: true
+        is_active: true,
       },
     };
   },
   computed: {
     goods() {
-      console.log(this.$store)
+      console.log(this.$store.state.goods);
       return this.$store.state.goods;
-    }
+    },
   },
 
   methods: {
     reverseMessage: function () {
-      this.message = this.message.split('').reverse().join('')
+      this.message = this.message.split("").reverse().join("");
     },
     get: function () {
-      console.log("get")
-      this.$store.dispatch("getGoods")
+      console.log("get");
+      this.$store.dispatch("getGoods");
     },
+  },
+  beforeMount() {
+    this.$store.dispatch("getGoods").then();
   },
   components: {
     GoodCard,
@@ -56,7 +66,7 @@ export default {
 </script>
 
 <style>
-button{
-  padding: 20px;
+.search-form {
+  margin-bottom: 40px;
 }
 </style>
