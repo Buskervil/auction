@@ -6,10 +6,10 @@ export const HTTP = axios.create({
   timeout: 1000,
 });
 
-HTTP.interceptors.request.use((request) => {
-  request.headers.common.Authorization = store.getters.access_token;
-  return request;
-});
+// HTTP.interceptors.request.use((request) => {
+//   request.headers.common.Authorization = store.getters.access_token;
+//   return request;
+// });
 
 export const User = {
   register([name, email, pass, pass_retype, first_name, last_name]) {

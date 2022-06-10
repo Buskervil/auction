@@ -3,7 +3,11 @@
     <div class="row g-0">
       <div class="col-md-4">
         <img
-          :src="good.images[0].image"
+          :src="
+            good.images
+              ? good.images[0].image
+              : require('../assets/placeholder.png')
+          "
           alt="Изображение товара"
           class="img-fluid rounded-start"
         />

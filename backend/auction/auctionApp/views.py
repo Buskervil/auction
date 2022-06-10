@@ -2,6 +2,7 @@ from django.shortcuts import render
 from rest_framework import viewsets
 from django.contrib.auth.models import User
 from rest_framework import permissions
+from rest_framework import filters
 from rest_framework import generics
 from rest_framework_simplejwt.views import TokenObtainPairView
 
@@ -24,6 +25,8 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
 class GoodViewSet(viewsets.ModelViewSet):
     queryset = Good.objects.all()
     serializer_class = GoodSerializer
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['title', 'description', 'owner__username', 'owner__first_name']
     # permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
 
     # def perform_create(self, serializer):

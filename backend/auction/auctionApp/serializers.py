@@ -53,9 +53,9 @@ class GoodImageSerializer(serializers.ModelSerializer):
 class GoodSerializer(serializers.ModelSerializer):
     # images = serializers.HyperlinkedRelatedField(
     #     many=True, queryset=GoodImage.objects.all(), view_name='goodimage-detail')
-    images = GoodImageSerializer(many=True)
+    images = GoodImageSerializer(many=True, read_only=True)
     comments = serializers.PrimaryKeyRelatedField(
-        many=True, queryset=GoodComment.objects.all())
+        many=True, queryset=GoodComment.objects.all(), allow_null = True)
     orders_count = serializers.SerializerMethodField()
 
     def get_orders_count(self, obj):
