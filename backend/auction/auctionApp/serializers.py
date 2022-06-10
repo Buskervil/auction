@@ -1,4 +1,5 @@
 # backend/notes/serializers.py
+from django.forms import BooleanField
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from .models import Good, GoodComment, GoodImage, Auction, Bet, Order, UserProfile
@@ -57,6 +58,8 @@ class GoodSerializer(serializers.ModelSerializer):
     comments = serializers.PrimaryKeyRelatedField(
         many=True, queryset=GoodComment.objects.all(), allow_null = True)
     orders_count = serializers.SerializerMethodField()
+    auctions = serializers.PrimaryKeyRelatedField(
+        many=True, queryset=Auction.objects.all().filter(closed=False), allow_null = True)
 
     def get_orders_count(self, obj):
         return obj.orders.count()

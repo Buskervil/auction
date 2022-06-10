@@ -4,6 +4,8 @@ import RegisterView from "../views/RegisterView.vue";
 import LoginView from "../views/LoginView.vue";
 import RegisterSucsessView from "../views/RegisterSucsessView.vue";
 import ProfileView from "../views/ProfileView.vue";
+import GoodView from "../views/GoodView.vue";
+import MyGoodEditView from "../views/MyGoodEditView.vue";
 
 const routes = [
   {
@@ -39,6 +41,12 @@ const routes = [
     path: "/profile",
     name: "profile",
     component: ProfileView,
+  },
+  { path: "/good/:id", component: GoodView },
+  {
+    path: "/good/:id/edit",
+    name: "good-edit",
+    component: MyGoodEditView,
   },
 ];
 
