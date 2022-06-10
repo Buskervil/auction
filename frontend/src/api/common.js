@@ -43,11 +43,23 @@ export const User = {
       });
   },
 
-  get_profile(id) {
+  getUserById(id) {
     console.log(store.state.token.access);
     console.log("Иду в api");
     console.log(`Bearer ${store.state.token.access}`);
     return HTTP.get(`/user/${id}`)
+      .then((response) => {
+        return response;
+      })
+      .catch((error) => {
+        return error.response;
+      });
+  },
+
+  getUserProfile(id) {
+    console.log(store.state.token.access);
+    console.log("Иду в api");
+    return HTTP.get(`/user-profile/${id}`)
       .then((response) => {
         return response;
       })

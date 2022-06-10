@@ -1,13 +1,19 @@
 <template>
-  <div>
-    <div class="good-card">
-      <div class="good-card__description">
-        <p class="good-card__title">{{ good.title }}</p>
-        <p class="good-card__short">{{ good.description }}</p>
-        <p class="good-price">{{ good.price }}</p>
+  <div class="card mb-3 text-bg-light">
+    <div class="row g-0">
+      <div class="col-md-4">
+        <img
+          :src="good.images[0].image"
+          alt="Изображение товара"
+          class="img-fluid rounded-start"
+        />
       </div>
-      <div class="good-card__image-container">
-        <img src="" alt="Изображение товара" class="good-card__image" />
+      <div class="col-md-8">
+        <div class="card-body">
+          <h5 class="card-title">{{ good.title }}</h5>
+          <p class="card-text">{{ good.description }}</p>
+          <p class="good-price">{{ good.price }}</p>
+        </div>
       </div>
     </div>
   </div>
@@ -22,12 +28,4 @@ export default {
 };
 </script>
 
-<style lang="scss">
-.good-card {
-  display: flex;
-  height: 80px;
-  width: 80%;
-  background-color: #ccc;
-  padding: 20px;
-}
-</style>
+<style lang="scss"></style>

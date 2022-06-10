@@ -43,10 +43,17 @@ class UserSerializer(serializers.ModelSerializer):
         exclude = ['password', 'is_superuser',
                    'is_staff', 'groups', 'user_permissions']
 
+class GoodImageSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = GoodImage
+        fields = '__all__'
+
 
 class GoodSerializer(serializers.ModelSerializer):
-    images = serializers.PrimaryKeyRelatedField(
-        many=True, queryset=GoodImage.objects.all())
+    # images = serializers.HyperlinkedRelatedField(
+    #     many=True, queryset=GoodImage.objects.all(), view_name='goodimage-detail')
+    images = GoodImageSerializer(many=True)
     comments = serializers.PrimaryKeyRelatedField(
         many=True, queryset=GoodComment.objects.all())
     orders_count = serializers.SerializerMethodField()
@@ -66,11 +73,7 @@ class GoodCommentSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class GoodImageSerializer(serializers.ModelSerializer):
 
-    class Meta:
-        model = GoodImage
-        fields = '__all__'
 
 
 class AuctionSerializer(serializers.ModelSerializer):

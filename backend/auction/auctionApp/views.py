@@ -24,7 +24,7 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
 class GoodViewSet(viewsets.ModelViewSet):
     queryset = Good.objects.all()
     serializer_class = GoodSerializer
-    permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
+    # permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
 
     # def perform_create(self, serializer):
     #     serializer.save(owner=self.request.user)

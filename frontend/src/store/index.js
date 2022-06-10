@@ -14,6 +14,7 @@ export default createStore({
       access: "",
     },
     user: {},
+    userProfile: {},
   }, // здесь объекты, хранящие состояние
 
   getters: {
@@ -32,8 +33,11 @@ export default createStore({
       state.token = { refresh: refresh, access: access };
       state.user_id = user_id;
     },
-    setProfile(state, data) {
+    setUser(state, data) {
       state.user = data;
+    },
+    setUserProfile(state, data) {
+      state.userProfile = data;
     },
   }, // здесь функции для изменения состояния (синхронные)
 
@@ -60,11 +64,18 @@ export default createStore({
     },
     getProfile({ commit, state }) {
       console.log("Мы зареганы, я пошел за профилем");
-      User.get_profile(state.user_id).then((response) => {
-        console.log("Ответ пришел");
-        console.log(response.data);
-        commit("setProfile", response.data);
-      });
+      User.getUserById(state.user_id)
+        .then((response) => {
+          console.log("Ответ пришел");
+          console.log(response.data);
+          commit("setUser", response.data);
+        })
+        .then(() => {
+          User.getUserProfile(state.user.id).then((r) => {
+            console.log("Получил профиль" + r.data);
+            commit("setUserProfile", r.data);
+          });
+        });
     },
   }, // это прокси для mutation (здесь можно асинхрон)
   modules: {},
