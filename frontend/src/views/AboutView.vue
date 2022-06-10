@@ -7,11 +7,14 @@
           id="search"
           class="form-control"
           v-model="query"
+          v-on:input="searchHandler"
           placeholder="Чайник электрический"
         />
         <label for="search">Введите название товара</label>
       </div>
-      <button class="search-button btn btn-dark col-1">Поиск</button>
+      <button class="search-button btn btn-dark col-1" v-on:click="get">
+        Поиск
+      </button>
     </div>
     <GoodCard
       v-for="good in goods"
@@ -54,6 +57,9 @@ export default {
     get: function () {
       console.log("get");
       this.$store.dispatch("getGoods");
+    },
+    searchHandler: function () {
+      this.$store.dispatch("searchGoods", { query: this.query });
     },
   },
   beforeMount() {

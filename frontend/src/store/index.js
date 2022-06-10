@@ -50,6 +50,14 @@ export default createStore({
         commit("setGoods", goods.data.results);
       });
     },
+    searchGoods({ commit }, { query = "" }) {
+      console.log("зашли");
+      Good.list(query).then((goods) => {
+        console.log("Получил из API");
+        console.log(goods.data);
+        commit("setGoods", goods.data.results);
+      });
+    },
     login({ commit }, { username, password }) {
       console.log("Username" + username);
       return User.login(username, password).then((response) => {

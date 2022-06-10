@@ -1,4 +1,5 @@
 # backend/notes/serializers.py
+from django.forms import BooleanField
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from .models import Good, GoodComment, GoodImage, Auction, Bet, Order, UserProfile
@@ -53,10 +54,12 @@ class GoodImageSerializer(serializers.ModelSerializer):
 class GoodSerializer(serializers.ModelSerializer):
     # images = serializers.HyperlinkedRelatedField(
     #     many=True, queryset=GoodImage.objects.all(), view_name='goodimage-detail')
-    images = GoodImageSerializer(many=True)
+    images = GoodImageSerializer(many=True, read_only=True)
     comments = serializers.PrimaryKeyRelatedField(
-        many=True, queryset=GoodComment.objects.all())
+        many=True, queryset=GoodComment.objects.all(), allow_null = True)
     orders_count = serializers.SerializerMethodField()
+    auctions = serializers.PrimaryKeyRelatedField(
+        many=True, queryset=Auction.objects.all().filter(closed=False), allow_null = True)
 
     def get_orders_count(self, obj):
         return obj.orders.count()
