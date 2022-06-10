@@ -14,7 +14,6 @@ export default {
     return {
       message: "Приветствую, твое Вью приложение",
     };
-    
   },
   name: "HomeView",
   components: {

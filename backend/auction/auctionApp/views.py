@@ -3,11 +3,15 @@ from rest_framework import viewsets
 from django.contrib.auth.models import User
 from rest_framework import permissions
 from rest_framework import generics
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 from .permissions import IsOwnerOrReadOnly
 from .models import Good, GoodImage, GoodComment, Auction, Bet, Order
-from .serializers import GoodSerializer, GoodImageSerializer, GoodCommentSerializer, AuctionSerializer, BetSerializer, OrderSerializer, UserSerializer, RegisterSerializer
+from .serializers import GoodSerializer, GoodImageSerializer, GoodCommentSerializer, AuctionSerializer, BetSerializer, OrderSerializer, UserSerializer, RegisterSerializer, MyTokenObtainPairSerializer
 
+
+class MyTokenObtainPairView(TokenObtainPairView):
+    serializer_class = MyTokenObtainPairSerializer
 
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -22,8 +26,8 @@ class GoodViewSet(viewsets.ModelViewSet):
     serializer_class = GoodSerializer
     permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
 
-    def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)
+    # def perform_create(self, serializer):
+    #     serializer.save(owner=self.request.user)
 
 class GoodImageViewSet(viewsets.ModelViewSet):
     queryset = GoodImage.objects.all()
