@@ -5,10 +5,16 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 # Create your models here.
 
 
+class UserProfile(models.Model):
+    owner = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    avatar = models.ImageField()
+
+
 class Good(models.Model):
     title = models.CharField(max_length=128)
     description = models.TextField(max_length=1024, blank=True)
-    price = models.DecimalField(max_digits=12, decimal_places=2, validators=[MinValueValidator(0)])
+    price = models.DecimalField(
+        max_digits=12, decimal_places=2, validators=[MinValueValidator(0)])
     published_at = models.DateTimeField(auto_now_add=True)
     owner = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='goods')
@@ -60,8 +66,11 @@ class Bet(models.Model):
 
 
 class Order(models.Model):
-    buyer = models.ForeignKey(User, on_delete=models.CASCADE, related_name="orders")
-    good = models.ForeignKey(Good, on_delete=models.PROTECT, related_name="orders")
+    buyer = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="orders")
+    good = models.ForeignKey(
+        Good, on_delete=models.PROTECT, related_name="orders")
     buyer_adress = models.CharField(max_length=512)
     track_number = models.CharField(max_length=128)
-    status = models.CharField(max_length=128, choices=[(0, 'Ожидает отправки'), (1, 'Отправлен'), (2, 'Получен')], default='Ожидает отправки')
+    status = models.CharField(max_length=128, choices=[(
+        0, 'Ожидает отправки'), (1, 'Отправлен'), (2, 'Получен')], default='Ожидает отправки')

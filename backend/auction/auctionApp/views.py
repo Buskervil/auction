@@ -6,8 +6,8 @@ from rest_framework import generics
 from rest_framework_simplejwt.views import TokenObtainPairView
 
 from .permissions import IsOwnerOrReadOnly
-from .models import Good, GoodImage, GoodComment, Auction, Bet, Order
-from .serializers import GoodSerializer, GoodImageSerializer, GoodCommentSerializer, AuctionSerializer, BetSerializer, OrderSerializer, UserSerializer, RegisterSerializer, MyTokenObtainPairSerializer
+from .models import Good, GoodImage, GoodComment, Auction, Bet, Order, UserProfile
+from .serializers import GoodSerializer, GoodImageSerializer, GoodCommentSerializer, AuctionSerializer, BetSerializer, OrderSerializer, UserSerializer, RegisterSerializer, MyTokenObtainPairSerializer, UserProfileSerializer
 
 
 class MyTokenObtainPairView(TokenObtainPairView):
@@ -48,3 +48,7 @@ class BetViewSet(viewsets.ModelViewSet):
 class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer    
+
+class UserProfileViewSet(viewsets.ModelViewSet):
+    queryset = UserProfile.objects.all()
+    serializer_class = UserProfileSerializer

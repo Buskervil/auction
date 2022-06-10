@@ -1,7 +1,7 @@
 # backend/notes/serializers.py
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import Good, GoodComment, GoodImage, Auction, Bet, Order
+from .models import Good, GoodComment, GoodImage, Auction, Bet, Order, UserProfile
 from rest_framework.validators import UniqueValidator
 from django.contrib.auth.password_validation import validate_password
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
@@ -20,10 +20,17 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 
         return data
 
+class UserProfileSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = UserProfile
+        fields = "__all__"
+
 
 class UserSerializer(serializers.ModelSerializer):
     goods_count = serializers.SerializerMethodField()
     orders_count = serializers.SerializerMethodField()
+    profile = serializers.PrimaryKeyRelatedField(many=False, queryset=User.profile)
 
     def get_goods_count(self, obj):
         return obj.goods.filter(is_active=True).count()
