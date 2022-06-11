@@ -2,18 +2,70 @@
   <div class="container">
     <div class="form">
       <p>Товар</p>
-      <input type="text" id="title" v-model="good.title" />
-      <label for="title">Название товара</label>
-      <input type="text" id="description" v-model="good.description" />
-      <label for="description">Описание товара</label>
-      <input type="image" id="images" v-model="good.images[0]" />
-      <label for="images">Картинка</label>
-      <input type="number" id="price" v-model="good.price" />
-      <label for="price">Цена</label>
-      <input type="checkbox" id="is_active" v-model="good.is_active" />
-      <label for="is_active">Опубликовать сейчас</label>
+      <div class="form-floating">
+        <input
+          type="text"
+          id="title"
+          v-model="good.title"
+          placeholder="Чайник электрический"
+          class="form-control"
+        />
+        <label for="title">Название товара</label>
+      </div>
+      <div class="form-floating">
+        <input
+          type="text"
+          id="description"
+          v-model="good.description"
+          placeholder="Чайник электрический"
+          class="form-control"
+        />
+        <label for="description">Описание товара</label>
+      </div>
+
+      <input
+        type="file"
+        accept="image/*"
+        multiple
+        id="images"
+        ref="images"
+        v-on:change="handleFileUploads"
+        class="invisible"
+      />
+      <button v-on:click="addFiles()" class="btn btn-dark">
+        Загрузить изображения
+      </button>
+      <div class="form-floating">
+        <input
+          type="number"
+          id="price"
+          v-model="good.price"
+          placeholder="Чайник электрический"
+          class="form-control"
+        />
+        <label for="price">Цена</label>
+      </div>
+      <div class="form-check">
+        <input
+          type="checkbox"
+          id="is_active"
+          v-model="good.is_active"
+          placeholder="Чайник электрический"
+          class="form-check-input"
+        />
+        <label for="is_active" class="form-check-label"
+          >Опубликовать сейчас</label
+        >
+      </div>
+
+      <img
+        v-for="(image, index) in good.images"
+        v-bind:key="index"
+        :src="getUrl(good.images[index])"
+        alt=""
+      />
     </div>
-    <div class="form">
+    <!-- <div class="form">
       <p>Аукцион</p>
       <input
         type="datetime-local"
@@ -36,7 +88,7 @@
       />
       <label for="is_active">Активен</label>
     </div>
-    {{ good }}
+    {{ good }} -->
   </div>
 </template>
 
@@ -62,6 +114,25 @@ export default {
     formatDate() {
       console.log(typeof this.good.published_at);
       return "";
+    },
+  },
+  methods: {
+    addFiles() {
+      this.$refs.images.click();
+    },
+    handleFileUploads() {
+      let uploadedFiles = this.$refs.images.files;
+      for (var i = 0; i < uploadedFiles.length; i++) {
+        this.good.images.push(uploadedFiles[i]);
+      }
+    },
+    getUrl(file) {
+      console.log(file.image);
+      if (file.image) {
+        return file.image;
+      } else {
+        return URL.createObjectURL(file);
+      }
     },
   },
 };
