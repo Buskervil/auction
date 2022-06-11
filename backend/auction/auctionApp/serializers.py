@@ -6,6 +6,7 @@ from .models import Good, GoodComment, GoodImage, Auction, Bet, Order, UserProfi
 from rest_framework.validators import UniqueValidator
 from django.contrib.auth.password_validation import validate_password
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from drf_writable_nested.serializers import WritableNestedModelSerializer
 
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -50,23 +51,39 @@ class GoodImageSerializer(serializers.ModelSerializer):
         model = GoodImage
         fields = '__all__'
 
+class AuctionSerializer(serializers.ModelSerializer):
 
-class GoodSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Auction
+        fields = '__all__'
+
+
+class GoodSerializer(WritableNestedModelSerializer):
     # images = serializers.HyperlinkedRelatedField(
     #     many=True, queryset=GoodImage.objects.all(), view_name='goodimage-detail')
-    images = GoodImageSerializer(many=True, read_only=True)
+    images = GoodImageSerializer(many=True, allow_null=True, required=False)
     comments = serializers.PrimaryKeyRelatedField(
-        many=True, queryset=GoodComment.objects.all(), allow_null = True)
+        many=True, read_only = True)
     orders_count = serializers.SerializerMethodField()
-    auctions = serializers.PrimaryKeyRelatedField(
-        many=True, queryset=Auction.objects.all().filter(closed=False), allow_null = True)
-
+    auctions = AuctionSerializer(many=True, read_only=False, allow_null=True, required=False)
+    owner = UserSerializer(read_only = True)
     def get_orders_count(self, obj):
         return obj.orders.count()
 
     class Meta:
         model = Good
         fields = '__all__'
+
+    def create(self, validated_data):
+        try:
+            images = validated_data.pop('images')
+        except:
+            images = []
+        validated_data['owner'] = self.context['request'].user
+        good = Good.objects.create(**validated_data)
+        for image in images:
+            GoodImage.objects.create(good=good, **image)
+        return good
 
 
 class GoodCommentSerializer(serializers.ModelSerializer):
@@ -79,11 +96,7 @@ class GoodCommentSerializer(serializers.ModelSerializer):
 
 
 
-class AuctionSerializer(serializers.ModelSerializer):
 
-    class Meta:
-        model = Auction
-        fields = '__all__'
 
 
 class BetSerializer(serializers.ModelSerializer):

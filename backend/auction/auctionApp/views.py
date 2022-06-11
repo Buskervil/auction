@@ -27,10 +27,12 @@ class GoodViewSet(viewsets.ModelViewSet):
     serializer_class = GoodSerializer
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['title', 'description', 'owner__username', 'owner__first_name']
-    # permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
+    permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
 
     # def perform_create(self, serializer):
     #     serializer.save(owner=self.request.user)
+    def get_serializer_context(self):
+        return {'request': self.request}
 
 class GoodImageViewSet(viewsets.ModelViewSet):
     queryset = GoodImage.objects.all()

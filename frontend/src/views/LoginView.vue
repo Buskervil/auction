@@ -8,32 +8,6 @@
             <a href="/register" class="link">Регистрация</a>
           </h2>
         </div>
-        <!-- <label for="username">
-          Username
-          <input
-            v-model="userName"
-            v-bind:class="{ 'is-invalid': serverResponse.username }"
-            type="text"
-            id="username"
-            class="form-control"
-          />
-          <div id="validationServerUsernameFeedback" class="invalid-feedback">
-            {{ serverResponse.username }}
-          </div>
-        </label>
-        <label for="password">
-          Password
-          <input
-            v-model="password"
-            v-bind:class="{ 'is-invalid': serverResponse.password }"
-            type="password"
-            id="password"
-            class="form-control"
-          />
-          <div id="validationServerUsernameFeedback" class="invalid-feedback">
-            {{ serverResponse.password }}
-          </div>
-        </label> -->
         <div
           v-for="(field, index) in loginFields"
           :key="index"
