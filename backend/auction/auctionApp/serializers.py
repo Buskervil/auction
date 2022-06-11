@@ -6,6 +6,7 @@ from .models import Good, GoodComment, GoodImage, Auction, Bet, Order, UserProfi
 from rest_framework.validators import UniqueValidator
 from django.contrib.auth.password_validation import validate_password
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from drf_writable_nested.serializers import WritableNestedModelSerializer
 
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -57,7 +58,7 @@ class AuctionSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class GoodSerializer(serializers.ModelSerializer):
+class GoodSerializer(WritableNestedModelSerializer):
     # images = serializers.HyperlinkedRelatedField(
     #     many=True, queryset=GoodImage.objects.all(), view_name='goodimage-detail')
     images = GoodImageSerializer(many=True, allow_null=True, required=False)
@@ -65,7 +66,7 @@ class GoodSerializer(serializers.ModelSerializer):
         many=True, read_only = True)
     orders_count = serializers.SerializerMethodField()
     auctions = AuctionSerializer(many=True, read_only=False, allow_null=True, required=False)
-    owner = serializers.PrimaryKeyRelatedField(read_only = True)
+    owner = UserSerializer(read_only = True)
     def get_orders_count(self, obj):
         return obj.orders.count()
 

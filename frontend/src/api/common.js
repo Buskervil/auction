@@ -3,7 +3,6 @@ import store from "../store";
 
 export const HTTP = axios.create({
   baseURL: "http://127.0.0.1:8000/",
-  timeout: 1000,
 });
 
 HTTP.interceptors.request.use((request) => {

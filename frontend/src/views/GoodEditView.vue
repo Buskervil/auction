@@ -1,8 +1,7 @@
 <template>
   <div class="container">
-    <div class="form">
-      <p>Товар</p>
-      <div class="form-floating">
+    <div class="row gy-3">
+      <div class="form-floating col-md-6">
         <input
           type="text"
           id="title"
@@ -12,30 +11,7 @@
         />
         <label for="title">Название товара</label>
       </div>
-      <div class="form-floating">
-        <input
-          type="text"
-          id="description"
-          v-model="good.description"
-          placeholder="Чайник электрический"
-          class="form-control"
-        />
-        <label for="description">Описание товара</label>
-      </div>
-
-      <input
-        type="file"
-        accept="image/*"
-        multiple
-        id="images"
-        ref="images"
-        v-on:change="handleFileUploads"
-        class="invisible"
-      />
-      <button v-on:click="addFiles()" class="btn btn-dark">
-        Загрузить изображения
-      </button>
-      <div class="form-floating">
+      <div class="form-floating col-sm-2">
         <input
           type="number"
           id="price"
@@ -45,7 +21,7 @@
         />
         <label for="price">Цена</label>
       </div>
-      <div class="form-check">
+      <div class="form-check col-sm-2">
         <input
           type="checkbox"
           id="is_active"
@@ -57,42 +33,56 @@
           >Опубликовать сейчас</label
         >
       </div>
+      <div class="col-md-6">
+        <textarea
+          id="description"
+          v-model="good.description"
+          class="form-control"
+          wrap="soft"
+          rows="5"
+          placeholder="Описание товара"
+        ></textarea>
+      </div>
 
-      <img
-        v-for="(image, index) in good.images"
-        v-bind:key="index"
-        :src="getUrl(good.images[index])"
-        alt=""
+      <input
+        type="file"
+        accept="image/*"
+        multiple
+        id="images"
+        ref="images"
+        v-on:change="handleFileUploads"
+        class="hide"
       />
+      <div class="col-sm-3">
+        <div class="flex-start">
+          <button v-on:click="addFiles()" class="btn btn-dark self-start">
+            Загрузить изображения
+          </button>
+        </div>
+      </div>
+      <div v-if="good.images[0]" class="col-12">
+        <div class="flex-start">
+          <div
+            class="img-container cover"
+            v-for="(image, index) in good.images"
+            v-bind:key="index"
+          >
+            <img :src="getUrl(good.images[index])" alt="" />
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-4">
+        <div class="flex-start">
+          <button v-on:click="submit()" class="btn btn-dark">Сохранить</button>
+        </div>
+      </div>
     </div>
-    <!-- <div class="form">
-      <p>Аукцион</p>
-      <input
-        type="datetime-local"
-        id="started_at"
-        v-model="good.auctions[0].started_at"
-      />
-      <label for="closed_at">Время начала</label>
-      <input
-        type="datetime-local"
-        id="closed_at"
-        v-model="good.auctions[0].closed_at"
-      />
-      <label for="closed_at">Время окончания</label>
-      <input type="number" id="price" v-model="good.price" />
-      <label for="price">Цена</label>
-      <input
-        type="checkbox"
-        id="is_active"
-        v-model="good.auctions[0].is_active"
-      />
-      <label for="is_active">Активен</label>
-    </div>
-    {{ good }} -->
   </div>
 </template>
 
 <script>
+import { Good } from "../api/goods";
+
 export default {
   data() {
     return {
@@ -101,10 +91,11 @@ export default {
         description: "",
         price: "",
         amount: "",
-        is_active: "",
+        is_active: true,
         auctions: [{ started_at: "", colsed_at: "", min_price: "" }],
         images: [],
       },
+      oldImagesToDelete: [],
     };
   },
   computed: {
@@ -122,6 +113,8 @@ export default {
     },
     handleFileUploads() {
       let uploadedFiles = this.$refs.images.files;
+      this.oldImagesToDelete = this.good.images;
+      this.good.images = [];
       for (var i = 0; i < uploadedFiles.length; i++) {
         this.good.images.push(uploadedFiles[i]);
       }
@@ -134,22 +127,61 @@ export default {
         return URL.createObjectURL(file);
       }
     },
+    submit() {
+      console.log("Иду в axios количество картинок:" + this.good.images.length);
+      if (this.good.id)
+        Good.update({ good: this.good, toDelete: this.oldImagesToDelete });
+      else Good.create(this.good);
+    },
   },
 };
 </script>
 
-<style>
-.good-image-container {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-  overflow: hidden;
+<style lang="scss">
+.hide {
+  display: none;
 }
 
-.good-image {
-  /* width: 100%;
-  height: auto; */
+.flex-start {
+  display: flex;
+  justify-content: start;
+  gap: 20px;
+}
+
+.img-wraper-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.img-container {
+  width: 20%;
+  height: 200px;
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+}
+.img-container.contain img {
+  position: absolute;
+  left: -10000%;
+  right: -10000%;
+  top: -10000%;
+  bottom: -10000%;
+  margin: auto auto;
+  max-width: 10%;
+  max-height: 10%;
+  -webkit-transform: scale(10);
+  transform: scale(10);
+}
+.img-container.cover img {
+  position: absolute;
+  left: -10000%;
+  right: -10000%;
+  top: -10000%;
+  bottom: -10000%;
+  margin: auto auto;
+  min-width: 1000%;
+  min-height: 1000%;
+  -webkit-transform: scale(0.1);
+  transform: scale(0.1);
 }
 </style>
