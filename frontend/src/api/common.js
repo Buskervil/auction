@@ -6,9 +6,46 @@ export const HTTP = axios.create({
 });
 
 HTTP.interceptors.request.use((request) => {
-  request.headers.common.Authorization = store.getters.access_token;
+  if (store.getters.access_token)
+    request.headers.common.Authorization = store.getters.access_token;
   return request;
 });
+
+const token_interceptor = HTTP.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+
+  function (error) {
+    console.log("будем просить новые токены");
+    const originalRequest = error.config;
+    if (error.response.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+      store
+        .dispatch("refreshAccessToken")
+        .then(() => {
+          axios.defaults.headers.common["Authorization"] =
+            store.getters.access_token;
+          return HTTP(originalRequest);
+        })
+        .then(() => Promise.reject(error));
+    }
+  }
+);
+
+export const Token = {
+  refreshAccessToken() {
+    return HTTP.post("/token/refresh/", {
+      refresh: store.getters.refresh_token,
+    })
+      .then((response) => {
+        return response;
+      })
+      .catch((error) => {
+        return error.response;
+      });
+  },
+};
 
 export const User = {
   register([name, email, pass, pass_retype, first_name, last_name]) {
