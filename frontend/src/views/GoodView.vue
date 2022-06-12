@@ -42,6 +42,8 @@
             >{{ good.owner.username }}</router-link
           >
         </p>
+        <p>Количество заказов: {{ good.orders_count }}</p>
+        <p>Количество отзывов: {{ good.comments.length }}</p>
       </div>
       <div class="col-2 text-sm-start">
         <div class="flex-start buy-block">
@@ -55,12 +57,42 @@
           <button class="btn btn-dark">В корзину</button>
         </div>
       </div>
-      <div class="col-12"></div>
+      <h4>Аукционы</h4>
+      <div class="good-auctions col-md-8">
+        <p v-if="!good.auctions[0]">Нет активных аукционов</p>
+        <div v-if="good.auctions[0]" class="active-auction">
+          <AuctionComponent
+            v-bind:auction="good.auctions[0]"
+            class="blic"
+          ></AuctionComponent>
+        </div>
+      </div>
+      <div class="closed-auction col-md-4">
+        <p>
+          Всего прошло аукционов:
+          {{
+            good.auctions.length == 0
+              ? good.auctions.length
+              : good.auctions.length - 1
+          }}
+        </p>
+      </div>
+      <div class="comments-block col-12">
+        <h4>Отзывы</h4>
+        <CommentComponent
+          v-for="(comment, index) in good.comments"
+          v-bind:key="index"
+          v-bind:comment="comment"
+        ></CommentComponent>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
+import CommentComponent from "@/components/CommentComponent.vue";
+import AuctionComponent from "@/components/AuctionComponent.vue";
+
 export default {
   data() {
     return {
@@ -91,6 +123,10 @@ export default {
     setActiveImage(index) {
       this.activeImgIndex = index;
     },
+  },
+  components: {
+    CommentComponent,
+    AuctionComponent,
   },
 };
 </script>
@@ -132,5 +168,9 @@ export default {
   min-height: 1000%;
   -webkit-transform: scale(0.1);
   transform: scale(0.1);
+}
+
+h4 {
+  margin-top: 40px;
 }
 </style>

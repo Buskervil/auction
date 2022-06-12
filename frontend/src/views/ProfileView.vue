@@ -16,7 +16,7 @@
       </div>
 
       <div class="user-profile col">
-        <p>Ваш профиль</p>
+        <h3>Ваш профиль</h3>
         <p>Товаров в продаже: {{ user.goods_count }}</p>
         <p>Товаров заказано: {{ user.orders_count }}</p>
         <p>Имя: {{ user.first_name }} Фамилия: {{ user.last_name }}</p>

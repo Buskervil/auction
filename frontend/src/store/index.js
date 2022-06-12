@@ -49,6 +49,15 @@ export default createStore({
     setToken(state, { refresh, access }) {
       state.token = { refresh: refresh, access: access };
     },
+    logout(state) {
+      state.token = {};
+      state.user = {};
+      state.userProfile = {};
+      state.user_id = "";
+    },
+    clear(state) {
+      state.goods = [];
+    },
   }, // здесь функции для изменения состояния (синхронные)
 
   actions: {

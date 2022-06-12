@@ -18,7 +18,10 @@
             <h5 class="card-title">{{ good.title }}</h5>
             <p class="card-text">{{ good.description }}</p>
             <p class="good-price">{{ good.price }}</p>
-            <div class="auction-label" v-if="good.auctions[0]">
+            <div
+              class="auction-label badge text-bg-dark"
+              v-if="good.auctions[0]"
+            >
               <p>Идет аукцион</p>
             </div>
           </div>
@@ -48,5 +51,16 @@ export default {
 .good-link {
   text-decoration: none;
   cursor: pointer;
+}
+.good-card {
+  position: relative;
+}
+
+.auction-label {
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: rotate(-90deg);
+  transform-origin: top right;
 }
 </style>

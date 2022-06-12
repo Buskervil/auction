@@ -10,7 +10,7 @@ from drf_writable_nested.serializers import WritableNestedModelSerializer
 
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
-    
+
     def validate(self, attrs):
         data = super().validate(attrs)
 
@@ -22,6 +22,7 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 
         return data
 
+
 class UserProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -32,7 +33,8 @@ class UserProfileSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     goods_count = serializers.SerializerMethodField()
     orders_count = serializers.SerializerMethodField()
-    profile = serializers.PrimaryKeyRelatedField(many=False, queryset=User.profile)
+    profile = serializers.PrimaryKeyRelatedField(
+        many=False, queryset=User.profile)
 
     def get_goods_count(self, obj):
         return obj.goods.filter(is_active=True).count()
@@ -45,16 +47,44 @@ class UserSerializer(serializers.ModelSerializer):
         exclude = ['password', 'is_superuser',
                    'is_staff', 'groups', 'user_permissions']
 
+
 class GoodImageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = GoodImage
         fields = '__all__'
 
+
+class BetSerializer(serializers.ModelSerializer):
+    owner = serializers.StringRelatedField()
+
+    class Meta:
+        model = Bet
+        fields = '__all__'
+        
+
+    def create(self, validated_data):
+
+        validated_data['owner'] = self.context['request'].user
+        bet = Bet.objects.create(**validated_data)
+
+        return bet
+
+
 class AuctionSerializer(serializers.ModelSerializer):
+    bets = BetSerializer(read_only=True, many=True)
 
     class Meta:
         model = Auction
+        fields = '__all__'
+
+
+class GoodCommentSerializer(serializers.ModelSerializer):
+
+    owner = serializers.StringRelatedField()
+
+    class Meta:
+        model = GoodComment
         fields = '__all__'
 
 
@@ -62,11 +92,13 @@ class GoodSerializer(WritableNestedModelSerializer):
     # images = serializers.HyperlinkedRelatedField(
     #     many=True, queryset=GoodImage.objects.all(), view_name='goodimage-detail')
     images = GoodImageSerializer(many=True, allow_null=True, required=False)
-    comments = serializers.PrimaryKeyRelatedField(
-        many=True, read_only = True)
+    comments = GoodCommentSerializer(
+        many=True, read_only=True)
     orders_count = serializers.SerializerMethodField()
-    auctions = AuctionSerializer(many=True, read_only=False, allow_null=True, required=False)
-    owner = UserSerializer(read_only = True)
+    auctions = AuctionSerializer(
+        many=True, read_only=False, allow_null=True, required=False)
+    owner = UserSerializer(read_only=True)
+
     def get_orders_count(self, obj):
         return obj.orders.count()
 
@@ -84,26 +116,6 @@ class GoodSerializer(WritableNestedModelSerializer):
         for image in images:
             GoodImage.objects.create(good=good, **image)
         return good
-
-
-class GoodCommentSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = GoodComment
-        fields = '__all__'
-
-
-
-
-
-
-
-
-class BetSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Bet
-        fields = '__all__'
 
 
 class OrderSerializer(serializers.ModelSerializer):
