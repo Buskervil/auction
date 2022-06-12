@@ -1,40 +1,37 @@
 import axios from "axios";
 import store from "../store";
+//import createAuthRefreshInterceptor from "axios-auth-refresh";
 
 export const HTTP = axios.create({
   baseURL: "http://127.0.0.1:8000/",
 });
 
 HTTP.interceptors.request.use((request) => {
+  console.log("устанавливаю заголовки");
   if (store.getters.access_token)
     request.headers.common.Authorization = store.getters.access_token;
   return request;
 });
 
-const token_interceptor = HTTP.interceptors.response.use(
-  (response) => {
-    return response;
-  },
-
-  function (error) {
-    console.log("будем просить новые токены");
-    const originalRequest = error.config;
-    if (error.response.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
-      store
-        .dispatch("refreshAccessToken")
-        .then(() => {
-          axios.defaults.headers.common["Authorization"] =
-            store.getters.access_token;
-          return HTTP(originalRequest);
-        })
-        .then(() => Promise.reject(error));
+HTTP.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const status = error?.response?.status;
+    if (status === 401) {
+      return Token.refreshAccessToken().then((response) => {
+        store.commit("setToken", response.data);
+        error.config.headers["Authorization"] = store.getters.access_token;
+        return HTTP.request(error.config);
+      });
     }
+
+    return Promise.reject(error);
   }
 );
 
 export const Token = {
   refreshAccessToken() {
+    console.log("axios пошел за токеном");
     return HTTP.post("/token/refresh/", {
       refresh: store.getters.refresh_token,
     })

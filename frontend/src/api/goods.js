@@ -2,11 +2,14 @@ import { HTTP } from "./common";
 
 export const Good = {
   list(query = "") {
+    console.log("axios пошел за Товарами");
     return HTTP.get(`/good/?search=${query}`)
       .then((response) => {
+        console.log("Товары получены");
         return response;
       })
       .catch((error) => {
+        console.log("Товары не получены");
         return error.response;
       });
   },

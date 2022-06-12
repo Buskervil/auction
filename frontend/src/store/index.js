@@ -25,6 +25,9 @@ export default createStore({
     refresh_token: (state) => {
       return state.token.refresh;
     },
+    goods: (state) => {
+      return state.goods;
+    },
   }, // здесь функции для получения состояния в предобработанном виде (сортировки, фильтры и т.п)
 
   mutations: {
@@ -50,15 +53,17 @@ export default createStore({
 
   actions: {
     getGoods({ commit }) {
-      console.log("зашли");
-      Good.list().then((goods) => {
-        console.log("Получил из API");
-        console.log(goods.data);
-        commit("setGoods", goods.data.results);
-      });
+      console.log("вызван action получения товаров");
+      return Good.list()
+        .then((goods) => {
+          console.log("Получил из API" + goods.data);
+          console.log(goods.data);
+          commit("setGoods", goods.data.results);
+        })
+        .then(() => console.log("12345"));
     },
     searchGoods({ commit }, { query = "" }) {
-      console.log("зашли");
+      console.log("вызван action получения товаров");
       Good.list(query).then((goods) => {
         console.log("Получил из API");
         console.log(goods.data);
@@ -93,13 +98,15 @@ export default createStore({
         });
     },
     refreshAccessToken({ commit }) {
+      console.log("вызван action обновления токена");
       Token.refreshAccessToken().then((response) => {
+        console.log("action получил токен из axios");
         if (response.status == 200) {
-          commit("login", response.data);
-          return response;
+          commit("setToken", response.data);
+          return Promise.resolve();
         } else {
           console.log(response.data);
-          return response;
+          return Promise.reject();
         }
       });
     },
