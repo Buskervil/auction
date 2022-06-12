@@ -64,6 +64,9 @@ class Bet(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     is_final = models.BooleanField(default=False)
 
+    class Meta: 
+        ordering = ['-created_at']
+
 
 class Order(models.Model):
     buyer = models.ForeignKey(

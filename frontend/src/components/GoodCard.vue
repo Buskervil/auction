@@ -18,7 +18,10 @@
             <h5 class="card-title">{{ good.title }}</h5>
             <p class="card-text">{{ good.description }}</p>
             <p class="good-price">{{ good.price }}</p>
-            <div class="auction-label" v-if="good.auctions[0]">
+            <div
+              class="auction-label badge text-bg-dark"
+              v-if="good.auctions[0]"
+            >
               <p>Идет аукцион</p>
             </div>
           </div>
@@ -59,12 +62,5 @@ export default {
   right: 0;
   transform: rotate(-90deg);
   transform-origin: top right;
-  background-color: #212529;
-  color: white;
-  text-align: center;
-  border-radius: 4px;
-
-  padding: 10px;
-  padding-bottom: 0;
 }
 </style>

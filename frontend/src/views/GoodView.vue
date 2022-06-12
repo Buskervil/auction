@@ -57,16 +57,25 @@
           <button class="btn btn-dark">В корзину</button>
         </div>
       </div>
-      <div class="good-auctions">
-        <h4>Аукционы</h4>
+      <h4>Аукционы</h4>
+      <div class="good-auctions col-md-8">
         <p v-if="!good.auctions[0]">Нет активных аукционов</p>
-        <div class="active-auction">
-          <p>Активный аукцион</p>
-          {{ good.auctions[0] }}
+        <div v-if="good.auctions[0]" class="active-auction">
+          <AuctionComponent
+            v-bind:auction="good.auctions[0]"
+            class="blic"
+          ></AuctionComponent>
         </div>
-        <div class="closed-auction">
-          <p>Всего прошло аукционов: {{ good.auctions.length - 1 }}</p>
-        </div>
+      </div>
+      <div class="closed-auction col-md-4">
+        <p>
+          Всего прошло аукционов:
+          {{
+            good.auctions.length == 0
+              ? good.auctions.length
+              : good.auctions.length - 1
+          }}
+        </p>
       </div>
       <div class="comments-block col-12">
         <h4>Отзывы</h4>
@@ -82,6 +91,8 @@
 
 <script>
 import CommentComponent from "@/components/CommentComponent.vue";
+import AuctionComponent from "@/components/AuctionComponent.vue";
+
 export default {
   data() {
     return {
@@ -115,6 +126,7 @@ export default {
   },
   components: {
     CommentComponent,
+    AuctionComponent,
   },
 };
 </script>
@@ -156,5 +168,9 @@ export default {
   min-height: 1000%;
   -webkit-transform: scale(0.1);
   transform: scale(0.1);
+}
+
+h4 {
+  margin-top: 40px;
 }
 </style>

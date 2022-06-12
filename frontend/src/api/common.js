@@ -8,7 +8,8 @@ export const HTTP = axios.create({
 
 HTTP.interceptors.request.use((request) => {
   console.log("устанавливаю заголовки");
-  if (store.getters.access_token)
+  console.log(store.state.token.access);
+  if (store.state.token.access)
     request.headers.common.Authorization = store.getters.access_token;
   return request;
 });
@@ -18,7 +19,7 @@ HTTP.interceptors.response.use(
   (error) => {
     console.log(error);
     const status = error?.response?.status;
-    if (status === 401) {
+    if (status === 401 && !error.config.url.includes("token")) {
       return Token.refreshAccessToken().then((response) => {
         store.commit("setToken", response.data);
         error.config.headers["Authorization"] = store.getters.access_token;
@@ -28,7 +29,7 @@ HTTP.interceptors.response.use(
       store.commit("logout");
       store.commit("clear");
       router.push("/login");
-      return;
+      return error.response;
     }
     return Promise.reject(error);
   }
