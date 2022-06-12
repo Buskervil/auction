@@ -49,4 +49,22 @@ export default {
   text-decoration: none;
   cursor: pointer;
 }
+.good-card {
+  position: relative;
+}
+
+.auction-label {
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: rotate(-90deg);
+  transform-origin: top right;
+  background-color: #212529;
+  color: white;
+  text-align: center;
+  border-radius: 4px;
+
+  padding: 10px;
+  padding-bottom: 0;
+}
 </style>

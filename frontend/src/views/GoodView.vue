@@ -42,6 +42,8 @@
             >{{ good.owner.username }}</router-link
           >
         </p>
+        <p>Количество заказов: {{ good.orders_count }}</p>
+        <p>Количество отзывов: {{ good.comments.length }}</p>
       </div>
       <div class="col-2 text-sm-start">
         <div class="flex-start buy-block">
@@ -55,12 +57,31 @@
           <button class="btn btn-dark">В корзину</button>
         </div>
       </div>
-      <div class="col-12"></div>
+      <div class="good-auctions">
+        <h4>Аукционы</h4>
+        <p v-if="!good.auctions[0]">Нет активных аукционов</p>
+        <div class="active-auction">
+          <p>Активный аукцион</p>
+          {{ good.auctions[0] }}
+        </div>
+        <div class="closed-auction">
+          <p>Всего прошло аукционов: {{ good.auctions.length - 1 }}</p>
+        </div>
+      </div>
+      <div class="comments-block col-12">
+        <h4>Отзывы</h4>
+        <CommentComponent
+          v-for="(comment, index) in good.comments"
+          v-bind:key="index"
+          v-bind:comment="comment"
+        ></CommentComponent>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
+import CommentComponent from "@/components/CommentComponent.vue";
 export default {
   data() {
     return {
@@ -91,6 +112,9 @@ export default {
     setActiveImage(index) {
       this.activeImgIndex = index;
     },
+  },
+  components: {
+    CommentComponent,
   },
 };
 </script>

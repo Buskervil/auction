@@ -51,10 +51,23 @@ class GoodImageSerializer(serializers.ModelSerializer):
         model = GoodImage
         fields = '__all__'
 
-class AuctionSerializer(serializers.ModelSerializer):
+class BetSerializer(serializers.ModelSerializer):
+    owner = serializers.StringRelatedField()
+    class Meta:
+        model = Bet
+        fields = '__all__'
 
+class AuctionSerializer(serializers.ModelSerializer):
+    bets = BetSerializer(read_only=True, many=True)
     class Meta:
         model = Auction
+        fields = '__all__'
+
+class GoodCommentSerializer(serializers.ModelSerializer):
+
+    owner = serializers.StringRelatedField()
+    class Meta:
+        model = GoodComment
         fields = '__all__'
 
 
@@ -62,7 +75,7 @@ class GoodSerializer(WritableNestedModelSerializer):
     # images = serializers.HyperlinkedRelatedField(
     #     many=True, queryset=GoodImage.objects.all(), view_name='goodimage-detail')
     images = GoodImageSerializer(many=True, allow_null=True, required=False)
-    comments = serializers.PrimaryKeyRelatedField(
+    comments = GoodCommentSerializer(
         many=True, read_only = True)
     orders_count = serializers.SerializerMethodField()
     auctions = AuctionSerializer(many=True, read_only=False, allow_null=True, required=False)
@@ -86,11 +99,6 @@ class GoodSerializer(WritableNestedModelSerializer):
         return good
 
 
-class GoodCommentSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = GoodComment
-        fields = '__all__'
 
 
 
@@ -99,11 +107,8 @@ class GoodCommentSerializer(serializers.ModelSerializer):
 
 
 
-class BetSerializer(serializers.ModelSerializer):
 
-    class Meta:
-        model = Bet
-        fields = '__all__'
+
 
 
 class OrderSerializer(serializers.ModelSerializer):

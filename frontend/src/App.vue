@@ -19,6 +19,11 @@
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav">
           <li v-if="userId" class="nav-item">
+            <router-link to="/good/edit" class="nav-link plus"
+              >Новый товар</router-link
+            >
+          </li>
+          <li v-if="userId" class="nav-item">
             <router-link to="/profile" class="nav-link"
               >Мой профиль</router-link
             >

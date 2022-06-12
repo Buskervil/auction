@@ -55,6 +55,9 @@ export default createStore({
       state.userProfile = {};
       state.user_id = "";
     },
+    clear(state) {
+      state.goods = [];
+    },
   }, // здесь функции для изменения состояния (синхронные)
 
   actions: {
