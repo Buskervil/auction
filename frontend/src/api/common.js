@@ -1,14 +1,48 @@
 import axios from "axios";
 import store from "../store";
+//import createAuthRefreshInterceptor from "axios-auth-refresh";
 
 export const HTTP = axios.create({
   baseURL: "http://127.0.0.1:8000/",
 });
 
 HTTP.interceptors.request.use((request) => {
-  request.headers.common.Authorization = store.getters.access_token;
+  console.log("устанавливаю заголовки");
+  if (store.getters.access_token)
+    request.headers.common.Authorization = store.getters.access_token;
   return request;
 });
+
+HTTP.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const status = error?.response?.status;
+    if (status === 401) {
+      return Token.refreshAccessToken().then((response) => {
+        store.commit("setToken", response.data);
+        error.config.headers["Authorization"] = store.getters.access_token;
+        return HTTP.request(error.config);
+      });
+    }
+
+    return Promise.reject(error);
+  }
+);
+
+export const Token = {
+  refreshAccessToken() {
+    console.log("axios пошел за токеном");
+    return HTTP.post("/token/refresh/", {
+      refresh: store.getters.refresh_token,
+    })
+      .then((response) => {
+        return response;
+      })
+      .catch((error) => {
+        return error.response;
+      });
+  },
+};
 
 export const User = {
   register([name, email, pass, pass_retype, first_name, last_name]) {

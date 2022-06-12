@@ -16,6 +16,7 @@
         Поиск
       </button>
     </div>
+
     <GoodCard
       v-for="good in goods"
       v-bind:good="good"
@@ -45,8 +46,10 @@ export default {
   },
   computed: {
     goods() {
-      console.log(this.$store.state.goods);
-      return this.$store.state.goods;
+      console.log(
+        "Шаблон запрашивает товары" + this.$store.getters.goods || []
+      );
+      return this.$store.getters.goods;
     },
   },
 
@@ -62,8 +65,11 @@ export default {
       this.$store.dispatch("searchGoods", { query: this.query });
     },
   },
-  beforeMount() {
-    this.$store.dispatch("getGoods").then();
+  async beforeMount() {
+    await this.$store
+      .dispatch("getGoods")
+      .then(() => console.log("Товары загружены в хранилище 1"));
+    console.log("Товары загружены в хранилище 2");
   },
   components: {
     GoodCard,
