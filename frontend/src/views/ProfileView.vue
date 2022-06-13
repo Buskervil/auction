@@ -5,8 +5,8 @@
         <div class="avatar-container">
           <img
             :src="
-              userProfile.avatar
-                ? userProfile.avatar
+              user.profile
+                ? user.profile.avatar
                 : require('../assets/default-avatar.jpg')
             "
             alt=""
@@ -16,7 +16,7 @@
       </div>
 
       <div class="user-profile col">
-        <h3>Ваш профиль</h3>
+        <h3 v-if="userMe.id == user.id">Ваш профиль</h3>
         <p>Товаров в продаже: {{ user.goods_count }}</p>
         <p>Товаров заказано: {{ user.orders_count }}</p>
         <p>Имя: {{ user.first_name }} Фамилия: {{ user.last_name }}</p>
@@ -38,15 +38,14 @@ export default {
   computed: {
     user() {
       console.log("Уже беру данные");
-      return this.$store.state.user;
+      return this.$store.state.otherUser;
     },
-    userProfile() {
-      return this.$store.state.userProfile;
+    userMe() {
+      return this.$store.state.user;
     },
   },
   beforeMount() {
-    console.log("До монтирования");
-    this.$store.dispatch("getProfile").then();
+    this.$store.dispatch("getProfile", { id: this.$route.params.id });
   },
 };
 </script>

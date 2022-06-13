@@ -1,7 +1,7 @@
 <template>
   <div class="container">
-    <div class="row search-form">
-      <div class="form-floating col-5 offset-3">
+    <div class="row search-form gy-3">
+      <div class="form-floating col-md-5 offset-md-3">
         <input
           type="text"
           id="search"
@@ -12,7 +12,7 @@
         />
         <label for="search">Введите название товара</label>
       </div>
-      <button class="search-button btn btn-dark col-1" v-on:click="get">
+      <button class="search-button btn btn-dark col-md-1" v-on:click="get">
         Поиск
       </button>
     </div>
@@ -62,10 +62,7 @@ export default {
     },
   },
   async beforeMount() {
-    await this.$store
-      .dispatch("getGoods")
-      .then(() => console.log("Товары загружены в хранилище 1"));
-    console.log("Товары загружены в хранилище 2");
+    await this.$store.dispatch("searchGoods", { query: "" });
   },
   components: {
     GoodCard,

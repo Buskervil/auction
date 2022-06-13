@@ -18,32 +18,33 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav">
-          <li v-if="userId" class="nav-item">
+          <li v-if="user.id" class="nav-item">
             <router-link to="/good/edit" class="nav-link plus"
               >Новый товар</router-link
             >
           </li>
-          <li v-if="userId" class="nav-item">
-            <router-link to="/profile" class="nav-link"
-              >Мой профиль</router-link
+          <li v-if="user.id" class="nav-item">
+            <router-link :to="'/profile/' + user.id" class="nav-link"
+              >Мой профиль ({{ user.username }})</router-link
             >
           </li>
-          <li v-if="userId" class="nav-item">
+          <li v-if="user.id" class="nav-item">
             <router-link to="" class="nav-link" v-on:click="logout"
               >Выход</router-link
             >
           </li>
-          <li v-if="!userId" class="nav-item">
+          <li v-if="!user.id" class="nav-item">
             <router-link to="/register" class="nav-link"
               >Регистрация</router-link
             >
           </li>
-          <li v-if="!userId" class="nav-item">
+          <li v-if="!user.id" class="nav-item">
             <router-link to="/login" class="nav-link">Вход</router-link>
           </li>
-          <li v-if="userId" class="nav-item">
+          <li v-if="user.id" class="nav-item">
             <router-link to="/basket" class="nav-link">
               <img src="./assets/basket.png" alt="Корзина" width="25" />
+              {{ goodInBasketCount }}
             </router-link>
           </li>
         </ul>
@@ -59,12 +60,16 @@ export default {
     return {};
   },
   computed: {
-    userId() {
-      return this.$store.state.user_id;
+    user() {
+      return this.$store.state.user;
+    },
+    goodInBasketCount() {
+      return this.$store.state.basket.length;
     },
   },
   methods: {
     logout() {
+      this.$router.push("/login");
       this.$store.commit("logout");
     },
   },

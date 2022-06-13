@@ -71,19 +71,16 @@ export default {
         })
         .then((response) => {
           if (response.status != 200) {
-            console.log(`Вернулись в логин, Response`);
-            console.log(response.data);
             this.response = response.data;
-            console.log(this.response);
           } else {
-            this.$router.push("/profile");
+            this.$router.push("/profile/" + this.$store.state.user.id);
           }
         });
     },
   },
   computed: {
     user_id() {
-      return this.$store.state.user_id;
+      return this.$store.state.user.id;
     },
   },
 };

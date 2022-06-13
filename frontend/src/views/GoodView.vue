@@ -48,13 +48,13 @@
       <div class="col-2 text-sm-start">
         <div class="flex-start buy-block">
           <router-link
-            v-if="good.owner.id == user"
+            v-if="good.owner.id == user.id"
             :to="'/good/edit/' + good.id"
             class="good-link link"
             >редактировать</router-link
           >
           <p class="display-6">{{ good.price }}р</p>
-          <button class="btn btn-dark">В корзину</button>
+          <button class="btn btn-dark" v-on:click="toBasket">В корзину</button>
         </div>
       </div>
       <h4>Аукционы</h4>
@@ -101,14 +101,14 @@ export default {
   },
   computed: {
     good() {
-      return this.$store.state.goods[this.$route.params.id - 1];
+      return this.$store.state.currentGood;
     },
     formatDate() {
       console.log(typeof this.good.published_at);
       return "";
     },
     user() {
-      return this.$store.state.user_id;
+      return this.$store.state.user;
     },
   },
   methods: {
@@ -123,10 +123,20 @@ export default {
     setActiveImage(index) {
       this.activeImgIndex = index;
     },
+    // updateState() {
+    //   let goodId = this.$route.params.id;
+    // },
+    toBasket() {
+      this.$store.commit("addToBasket", this.good);
+    },
   },
   components: {
     CommentComponent,
     AuctionComponent,
+  },
+  beforeMount() {
+    //console.log(this.$route.params.id);
+    this.$store.dispatch("updateCurrentGood", { id: this.$route.params.id });
   },
 };
 </script>
