@@ -76,12 +76,61 @@
           <button v-on:click="submit()" class="btn btn-dark">Сохранить</button>
         </div>
       </div>
+      <div class="form-check col-sm-2">
+        <input
+          type="checkbox"
+          id="is_active"
+          v-model="runAuction"
+          placeholder="Чайник электрический"
+          class="form-check-input"
+        />
+        <label for="is_active" class="form-check-label"
+          >Запустить аукцион</label
+        >
+      </div>
+      <div class="col-sm-5"></div>
+      <div class="form-floating col-md-3" v-if="runAuction">
+        <input
+          class="form-control"
+          type="date"
+          id="closed_at"
+          placeholder="01.01.1990"
+          v-model="auction.closed_at_date"
+        />
+        <label for="closed_at">Дата окончания</label>
+      </div>
+      <div class="form-floating col-md-3" v-if="runAuction">
+        <input
+          class="form-control"
+          type="time"
+          id="closed_at"
+          placeholder="14:00"
+          v-model="auction.closed_at_time"
+        />
+        <label for="closed_at">Время окончания</label>
+      </div>
+      <div class="form-floating col-md-3" v-if="runAuction">
+        <input
+          class="form-control"
+          type="number"
+          id="min_price"
+          placeholder="400"
+          v-model="auction.min_price"
+        />
+        <label for="min_price">Начальная цена</label>
+      </div>
     </div>
+    {{ auction.closed_at_time }}
+    {{ auction.closed_at_date }}
+    {{ new Date(`${auction.closed_at_date}T${auction.closed_at_time}`) }}
+
+    <div class="auction row"></div>
   </div>
 </template>
 
 <script>
-import { Good } from "../api/goods";
+import { Auction } from "../api/auction";
+import { Good } from "../api/good";
 
 export default {
   data() {
@@ -92,24 +141,50 @@ export default {
         price: "",
         amount: "",
         is_active: true,
-        auctions: [{ started_at: "", colsed_at: "", min_price: "" }],
+        auctions: [],
         images: [],
       },
+
+      auction: {
+        closed_at_date: "",
+        closed_at_time: "",
+        min_price: 1000,
+      },
       oldImagesToDelete: [],
+      count: 0,
+      runAuction: false,
     };
   },
   computed: {
     good() {
-      return this.$store.state.goods[this.$route.params.id - 1] || this.newGood;
+      let currentGood = this.$store.state.currentGood.id
+        ? this.$store.state.currentGood
+        : this.newGood;
+      this.checkAuction(currentGood);
+      this.setAuction(currentGood);
+      return currentGood;
     },
-    formatDate() {
-      console.log(typeof this.good.published_at);
-      return "";
+    date() {
+      return new Date();
     },
   },
   methods: {
     addFiles() {
       this.$refs.images.click();
+    },
+    checkAuction(good) {
+      if (good.auctions[0]) this.runAuction = true;
+    },
+    setAuction(good) {
+      if (good.auctions[0]) {
+        let closed_at = new Date(good.auctions[0].closed_at);
+        this.auction = {
+          closed_at_date: closed_at.toLocaleDateString(),
+          closed_at_time: closed_at.toLocaleTimeString(),
+          min_price: good.auctions[0].min_price,
+        };
+      }
+      return;
     },
     handleFileUploads() {
       let uploadedFiles = this.$refs.images.files;
@@ -128,11 +203,46 @@ export default {
       }
     },
     submit() {
+      let date = new Date(
+        `${this.auction.closed_at_date}T${this.auction.closed_at_time}`
+      );
+
       console.log("Иду в axios количество картинок:" + this.good.images.length);
-      if (this.good.id)
-        Good.update({ good: this.good, toDelete: this.oldImagesToDelete });
-      else Good.create(this.good);
+      if (this.good.id) {
+        Good.update({
+          good: this.good,
+          toDelete: this.oldImagesToDelete,
+        }).then(() => {
+          let auction = {
+            closed_at: date,
+            min_price: this.auction.min_price,
+            good: this.good.id,
+          };
+          if (this.runAuction) Auction.create(auction);
+          this.$router.push(`/good/${this.good.id}`);
+        });
+      } else {
+        Good.create(this.good).then((response) => {
+          console.log("После создания нового продукта");
+          console.log(response);
+          let auction = {
+            closed_at: date,
+            min_price: this.auction.min_price,
+            good: response.data.id,
+          };
+          console.log("пусть аксиос создасть аукцион");
+          console.log(auction);
+          if (this.runAuction) Auction.create(auction);
+          this.$router.push(`/good/${response.data.id}`);
+        });
+      }
     },
+  },
+  beforeMount() {
+    console.log(this.$route.params.id);
+    if (this.$route.params.id)
+      this.$store.dispatch("updateCurrentGood", { id: this.$route.params.id });
+    else this.$store.commit("updateCurrentGood", {});
   },
 };
 </script>

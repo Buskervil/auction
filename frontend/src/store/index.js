@@ -1,21 +1,21 @@
 import { createStore } from "vuex";
 import createPersistedState from "vuex-persistedstate";
-import { Good } from "../api/goods";
-import { User } from "../api/common";
-import { Token } from "../api/common";
+import { Good } from "../api/good";
+import { User } from "../api/user";
 
 // дока тут https://vue3js.cn/vuex/ru/guide/state.html
 export default createStore({
   plugins: [createPersistedState()],
   state: {
     goods: [],
-    user_id: undefined,
+    currentGood: {},
+    otherUser: {},
     token: {
       refresh: "",
       access: "",
     },
     user: {},
-    userProfile: {},
+    basket: [],
   }, // здесь объекты, хранящие состояние
 
   getters: {
@@ -36,15 +36,12 @@ export default createStore({
       console.log(goods);
       state.goods = goods;
     },
-    login(state, { refresh, access, user_id }) {
+    login(state, { refresh, access, user }) {
       state.token = { refresh: refresh, access: access };
-      state.user_id = user_id;
+      state.user = user;
     },
     setUser(state, data) {
-      state.user = data;
-    },
-    setUserProfile(state, data) {
-      state.userProfile = data;
+      state.otherUser = data;
     },
     setToken(state, { refresh, access }) {
       state.token = { refresh: refresh, access: access };
@@ -52,70 +49,58 @@ export default createStore({
     logout(state) {
       state.token = {};
       state.user = {};
-      state.userProfile = {};
-      state.user_id = "";
     },
     clear(state) {
       state.goods = [];
     },
+    updateCurrentGood(state, good) {
+      state.currentGood = good;
+    },
+    updateOtherUser(state, user) {
+      state.otherUser = user;
+    },
+    addToBasket(state, good) {
+      state.basket.push(good);
+    },
   }, // здесь функции для изменения состояния (синхронные)
 
   actions: {
-    getGoods({ commit }) {
-      console.log("вызван action получения товаров");
-      return Good.list()
-        .then((goods) => {
-          console.log("Получил из API" + goods.data);
-          console.log(goods.data);
-          commit("setGoods", goods.data.results);
-        })
-        .then(() => console.log("12345"));
-    },
     searchGoods({ commit }, { query = "" }) {
-      console.log("вызван action получения товаров");
       Good.list(query).then((goods) => {
-        console.log("Получил из API");
-        console.log(goods.data);
         commit("setGoods", goods.data.results);
       });
     },
     login({ commit }, { username, password }) {
-      console.log("Username" + username);
       return User.login(username, password).then((response) => {
         if (response.status == 200) {
           commit("login", response.data);
           return response;
         } else {
-          console.log(response.data);
+          commit("login", []);
           return response;
         }
       });
     },
-    getProfile({ commit, state }) {
-      console.log("Мы зареганы, я пошел за профилем");
-      User.getUserById(state.user_id)
-        .then((response) => {
-          console.log("Ответ пришел");
-          console.log(response.data);
-          commit("setUser", response.data);
-        })
-        .then(() => {
-          User.getUserProfile(state.user.id).then((r) => {
-            console.log("Получил профиль" + r.data);
-            commit("setUserProfile", r.data);
-          });
-        });
+    getProfile({ commit }, { id }) {
+      User.getUserById(id).then((response) => {
+        commit("setUser", response.data);
+      });
     },
-    refreshAccessToken({ commit }) {
-      console.log("вызван action обновления токена");
-      Token.refreshAccessToken().then((response) => {
-        console.log("action получил токен из axios");
+    updateCurrentGood({ commit }, { id }) {
+      return Good.getById(id).then((response) => {
         if (response.status == 200) {
-          commit("setToken", response.data);
-          return Promise.resolve();
+          commit("updateCurrentGood", response.data);
         } else {
-          console.log(response.data);
-          return Promise.reject();
+          commit("updateCurrentGood", []);
+        }
+      });
+    },
+    updateOtherUser({ commit }, { id }) {
+      return Good.getById(id).then((response) => {
+        if (response.status == 200) {
+          commit("updateCurrentGood", response.data);
+        } else {
+          commit("updateCurrentGood", []);
         }
       });
     },

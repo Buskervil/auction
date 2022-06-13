@@ -50,6 +50,9 @@ class Auction(models.Model):
     min_price = models.DecimalField(max_digits=12, decimal_places=2)
     closed = models.BooleanField(default=False)
 
+    def get_owner(this):
+        return this.good.owner
+
     def close(this, user):
         if (this.good.user == user):
             this.closed = True

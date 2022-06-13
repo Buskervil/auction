@@ -27,6 +27,27 @@ export const Good = {
       .then((response) => {
         console.log(response);
         this.uploadGoodImages(good.images, response.data.id);
+        return response;
+      })
+      .catch((error) => console.log(error));
+  },
+  update({ good, toDelete }) {
+    var formatData = new FormData();
+    formatData.append("title", good.title);
+    formatData.append("description", good.description);
+    formatData.append("price", good.price);
+
+    return HTTP.put("/good/" + good.id + "/", formatData, {
+      headers: {
+        "Content-Type": "mulripart/form-data",
+      },
+    })
+      .then((response) => {
+        console.log(response);
+        this.uploadGoodImages(good.images, response.data.id);
+      })
+      .then(() => {
+        this.deleteGoodImages(toDelete);
       })
       .catch((error) => console.log(error));
   },
@@ -54,24 +75,16 @@ export const Good = {
         .catch((error) => console.log(error));
     }
   },
-  update({ good, toDelete }) {
-    var formatData = new FormData();
-    formatData.append("title", good.title);
-    formatData.append("description", good.description);
-    formatData.append("price", good.price);
-
-    return HTTP.put("/good/" + good.id + "/", formatData, {
-      headers: {
-        "Content-Type": "mulripart/form-data",
-      },
-    })
+  getById(id) {
+    console.log("axios пошел за товаром");
+    return HTTP.get(`/good/${id}/`)
       .then((response) => {
-        console.log(response);
-        this.uploadGoodImages(good.images, response.data.id);
+        console.log("Товары получены");
+        return response;
       })
-      .then(() => {
-        this.deleteGoodImages(toDelete);
-      })
-      .catch((error) => console.log(error));
+      .catch((error) => {
+        console.log("Товары не получены");
+        return error.response;
+      });
   },
 };

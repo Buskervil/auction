@@ -1,6 +1,7 @@
 import axios from "axios";
 import store from "../store";
 import router from "../router";
+import { Token } from "./token";
 
 export const HTTP = axios.create({
   baseURL: "http://127.0.0.1:8000/",
@@ -19,7 +20,11 @@ HTTP.interceptors.response.use(
   (error) => {
     console.log(error);
     const status = error?.response?.status;
-    if (status === 401 && !error.config.url.includes("token")) {
+    if (
+      status === 401 &&
+      !error.config.url.includes("token") &&
+      store.state.token.refresh
+    ) {
       return Token.refreshAccessToken().then((response) => {
         store.commit("setToken", response.data);
         error.config.headers["Authorization"] = store.getters.access_token;
@@ -34,76 +39,3 @@ HTTP.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-
-export const Token = {
-  refreshAccessToken() {
-    console.log("axios пошел за токеном");
-    return HTTP.post("/token/refresh/", {
-      refresh: store.getters.refresh_token,
-    })
-      .then((response) => {
-        return response;
-      })
-      .catch((error) => {
-        return error.response;
-      });
-  },
-};
-
-export const User = {
-  register([name, email, pass, pass_retype, first_name, last_name]) {
-    console.log("имя" + name);
-    return HTTP.post("/register/", {
-      username: name,
-      email: email,
-      password: pass,
-      password2: pass_retype,
-      first_name: first_name,
-      last_name: last_name,
-    })
-      .then((response) => {
-        return response;
-      })
-      .catch((error) => {
-        return error.response;
-      });
-  },
-
-  login(name, pass) {
-    return HTTP.post("/token/", {
-      username: name,
-      password: pass,
-    })
-      .then((response) => {
-        return response;
-      })
-      .catch((error) => {
-        return error.response;
-      });
-  },
-
-  getUserById(id) {
-    console.log(store.state.token.access);
-    console.log("Иду в api");
-    console.log(`Bearer ${store.state.token.access}`);
-    return HTTP.get(`/user/${id}`)
-      .then((response) => {
-        return response;
-      })
-      .catch((error) => {
-        return error.response;
-      });
-  },
-
-  getUserProfile(id) {
-    console.log(store.state.token.access);
-    console.log("Иду в api");
-    return HTTP.get(`/user-profile/${id}`)
-      .then((response) => {
-        return response;
-      })
-      .catch((error) => {
-        return error.response;
-      });
-  },
-};

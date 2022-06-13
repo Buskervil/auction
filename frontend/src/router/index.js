@@ -38,7 +38,7 @@ const routes = [
     component: RegisterSucsessView,
   },
   {
-    path: "/profile",
+    path: "/profile/:id",
     name: "profile",
     component: ProfileView,
   },

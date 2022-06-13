@@ -9,18 +9,7 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from drf_writable_nested.serializers import WritableNestedModelSerializer
 
 
-class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 
-    def validate(self, attrs):
-        data = super().validate(attrs)
-
-        refresh = self.get_token(self.user)
-
-        data["refresh"] = str(refresh)
-        data["access"] = str(refresh.access_token)
-        data["user_id"] = self.user.id
-
-        return data
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
@@ -33,8 +22,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     goods_count = serializers.SerializerMethodField()
     orders_count = serializers.SerializerMethodField()
-    profile = serializers.PrimaryKeyRelatedField(
-        many=False, queryset=User.profile)
+    profile = UserProfileSerializer()
 
     def get_goods_count(self, obj):
         return obj.goods.filter(is_active=True).count()
@@ -48,6 +36,19 @@ class UserSerializer(serializers.ModelSerializer):
                    'is_staff', 'groups', 'user_permissions']
 
 
+class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+
+    def validate(self, attrs):
+        data = super().validate(attrs)
+
+        refresh = self.get_token(self.user)
+
+        data["refresh"] = str(refresh)
+        data["access"] = str(refresh.access_token)
+        data["user"] = UserSerializer(self.user).data
+
+        return data
+
 class GoodImageSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -56,11 +57,11 @@ class GoodImageSerializer(serializers.ModelSerializer):
 
 
 class BetSerializer(serializers.ModelSerializer):
-    owner = serializers.StringRelatedField()
+    owner = serializers.StringRelatedField(read_only=True)
 
     class Meta:
         model = Bet
-        fields = '__all__'
+        fields = ['price', 'auction', 'owner', 'created_at']
         
 
     def create(self, validated_data):
@@ -73,6 +74,9 @@ class BetSerializer(serializers.ModelSerializer):
 
 class AuctionSerializer(serializers.ModelSerializer):
     bets = BetSerializer(read_only=True, many=True)
+    owner = serializers.SerializerMethodField()
+    def get_owner(self, obj):
+        return obj.get_owner().id
 
     class Meta:
         model = Auction

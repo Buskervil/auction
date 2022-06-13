@@ -42,7 +42,7 @@
 </template>
 
 <script>
-import { User, Test } from "../api/common";
+import { User } from "../api/user";
 
 export default {
   data() {
@@ -109,9 +109,6 @@ export default {
     },
     reverseMessage: function () {
       this.message = this.message.split("").reverse().join("");
-    },
-    test: function () {
-      Test.good();
     },
   },
 };
